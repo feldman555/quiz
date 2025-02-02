@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מבחן אבטחה</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            padding: 20px;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .result {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+        .correct {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+<h2>מבחן אבטחה</h2>
+
+<form id="quizForm">
+    <!-- שאלות יתווספו כאן באמצעות JavaScript -->
+</form>
+
+<button type="button" onclick="checkAnswers()">הגש מבחן</button>
+
+<div id="results" class="result"></div>
+
+<script>
+// מאגר השאלות והתשובות
+const questions = [
+    {
+        question: "מהי הדרך הנכונה להימנע ממגע עם אובייקט חשוד?",
+        options: ["יש לדווח מיידית למשטרה ולשמור מרחק", "מותר לבדוק את האובייקט בעדינות", "יש לנסות לפתור את הבעיה באופן עצמאי", "צריך להימנע מלהתקרב לאובייקט"],
+        correct: 0
+    },
+    {
+        question: "מה עליך לעשות אם אתה מוצא תיק חשוד?",
+        options: ["לא לגשת אליו ולקרוא לכוחות הביטחון", "לקחת את התיק ולבדוק את התוכן", "לפתוח את התיק ולראות אם יש בתוכו משהו חשוב", "להשאיר את התיק במקום ולדווח למנהל"],
+        correct: 0
+    },
+    {
+        question: "האם מותר להזיז אובייקטים חשודים?",
+        options: ["לא, יש להימנע ממגע ולהודיע לרשויות", "כן, אם האובייקט לא נראה מסוכן", "רק אם זה אובייקט קטן שאפשר לשים בצד", "מותר להזיז רק אם יש חשש לפיצוץ"],
+        correct: 0
+    },
+    {
+        question: "מה עושים אם יש סכנה מידית במתחם ציבורי?",
+        options: ["יש לפנות את האזור מיידית ולקרוא לעזרה", "להישאר במקום ולחכות לסיוע", "לאפשר לאנשים להסתובב באופן חופשי", "לסמן את האזור ולעדכן את ההנהלה"],
+        correct: 0
+    },
+    {
+        question: "איך יש לפעול במקרה של פיצוץ חשוד?",
+        options: ["לברוח מיידית ולקרוא לעזרה", "להישאר במקום ולחפש מישהו שמבין יותר", "לא לעשות כלום עד שיהיה ברור יותר מה קרה", "לנסות לבדוק את מקור הפיצוץ"],
+        correct: 0
+    },
+    {
+        question: "מה עליך לעשות אם יש לך ספק לגבי אובייקט חשוד?",
+        options: ["יש לדווח לרשויות ולהימנע מלהתקרב", "לעזוב את האזור ולא לדווח", "לנסות לפתור את הבעיה בעצמך", "להתעלם מהאובייקט ולהמשיך בעבודתך"],
+        correct: 0
+    },
+    // הוספה של עוד שאלות יכולה להימשך כאן עד למאגר גדול
+];
+
+// פונקציה לערבוב התשובות
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// פונקציה להחזרת 20 שאלות אקראיות
+function getRandomQuestions() {
+    shuffle(questions); // מערבב את השאלות
+    return questions.slice(0, 20); // מחזיר 20 שאלות
+}
+
+// יצירת המבחן והוספת השאלות לטופס
+function createQuiz() {
+    const quizForm = document.getElementById("quizForm");
+    const randomQuestions = getRandomQuestions();
+    randomQuestions.forEach((q, index) => {
+        shuffle(q.options); // מערבב את התשובות לשאלה
+        const questionDiv = document.createElement("div");
+        questionDiv.classList.add("question");
+        questionDiv.innerHTML = `
+            <p>${q.question}</p>
+            ${q.options.map((option, i) => `
+                <label><input type="radio" name="q${index}" value="${i}"> ${option}</label><br>
+            `).join("")}
+        `;
+        quizForm.appendChild(questionDiv);
+    });
+}
+
+// חישוב הציון
+function checkAnswers() {
+    const form = document.getElementById('quizForm');
+    let score = 0;
+    let errors = "";
+
+    const randomQuestions = getRandomQuestions();
+    
+    randomQuestions.forEach((q, index) => {
+        const userAnswer = form.querySelector(`input[name="q${index}"]:checked`);
+        if (userAnswer) {
+            if (parseInt(userAnswer.value) === q.correct) {
+                score += 5;
+            } else {
+                errors += `<p>שאלה ${index + 1}: תשובה שגויה</p>`;
+            }
+        } else {
+            errors += `<p>שאלה ${index + 1}: לא נבחרה תשובה</p>`;
+        }
+    });
+
+    const resultText = `הציון שלך: ${score}/100`;
+    const pass = score >= 85 ? "עברת את המבחן!" : "לא עברת את המבחן, נסה שוב.";
+    document.getElementById('results').innerHTML = resultText + "<br>" + pass + (errors ? "<div class='error'>" + errors + "</div>" : "");
+}
+
+// אתחול המבחן
+createQuiz();
+</script>
+
+</body>
+</html>
